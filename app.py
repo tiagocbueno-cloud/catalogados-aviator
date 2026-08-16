@@ -1,15 +1,13 @@
-# %%writefile app.py
 import streamlit as st
 import random
 import pandas as pd
-import time
 
 st.set_page_config(page_title="Simulador Estatístico Aviator", page_icon="✈️", layout="centered")
 
 st.title("✈️ Simulador Estatístico & Gestão Aviator")
 st.write("Testador matemático de estratégias baseado no algoritmo real de Crash.")
 
-# Inicializar estados de sessão para manter o histórico
+# Inicializar estados de sessão para manter o histórico e o saldo da banca
 if 'historico' not in st.session_state:
     st.session_state.historico = []
 if 'banca' not in st.session_state:
@@ -27,7 +25,7 @@ st.sidebar.header("🎰 Configurações de Aposta")
 valor_aposta = st.sidebar.number_input("Valor da Aposta (R$)", min_value=1.0, value=2.0, step=1.0)
 meta_cashout = st.sidebar.number_input("Meta de Auto-Cashout (x)", min_value=1.01, value=1.50, step=0.1)
 
-# Função geradora baseada em Provably Fair
+# Função geradora baseada em regras matemáticas reais (Provably Fair)
 def rodar_algoritmo():
     if random.random() < 0.10: # Taxa de perda instantânea (1.00x)
         return 1.00
@@ -56,10 +54,9 @@ st.markdown("### 📊 Status da sua Banca")
 st.metric(label="Saldo Atual", value=f"R$ {st.session_state.banca:.2f}")
 
 if st.session_state.historico:
-    # Exibir últimas rodadas com cores comerciais de monitoramento
+    # Exibir últimas rodadas com as cores padrões do jogo
     st.markdown("### 🕒 Histórico Recente de Velas")
     
-    # Criar linha visual de resultados (últimos 10)
     html_historico = ""
     for v in reversed(st.session_state.historico[-10:]):
         if v < 2.0:
@@ -68,7 +65,7 @@ if st.session_state.historico:
             cor, txt_cor = "#6b46c1", "white" # Roxo
         else:
             cor, txt_cor = "#b83280", "white" # Rosa
-        html_historico += f'<span style="background-color:{cor}; color:{txt_cor}; padding:5px 10px; margin:2px; border-radius:5px; font-weight:bold;">{v:.2f}x</span>'
+        html_historico += f'<span style="background-color:{cor}; color:{txt_cor}; padding:5px 10px; margin:2px; border-radius:5px; font-weight:bold; display:inline-block;">{v:.2f}x</span>'
     
     st.markdown(html_historico, unsafe_allow_html=True)
 
@@ -82,4 +79,4 @@ if st.session_state.historico:
     col1, col2, col3 = st.columns(3)
     col1.metric("Velas Azuis (<2x)", f"{(azuis/total)*100:.1f}%")
     col2.metric("Velas Roxas (2x-10x)", f"{(roxas/total)*100:.1f}%")
-    col3.metric("Velas Rosas (>=10x)",
+    col3.metric("Velas Rosas (>=10x)", f"{(rosas/total)*100:.1f}%")
